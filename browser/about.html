@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>About</title>
+
+    <!-- Bootstrap -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+</head>
+<body>
+<!-- Static navbar -->
+<nav class="navbar navbar-default navbar-static-top" style="height:50px">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="about.html">Bug Browser</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="about.html">About</a></li>
+                <li><a href="topics.html">Topic</a></li>
+                <li ><a href="bugs.html">Bugs</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://www.knightslab.org/">Knights Lab</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+</nav>
+<div class="container">
+        <p class="lead">The determination of bacterial phenotypes is an often labor intensive and informal process
+            of web and literature searches. This webpage presents an attempt to automate
+            the process of finding a bacterium's phenotype through a topic browser of all Pubmed abstracts related to the human gut microbiome.
+            Latent Dirichlet Allocation was performed on a corpus of ~1.1 million abstracts encompassing 1500 bacteria present
+            in the human gut. This was performed using a Python package called Gensim. Postprocessing of the topics allowed for creation of word clouds by the package wordcloud,
+            allowing for quick phenotypes of a bacterium based on the most prevalent words in the topics most related to a bacterium. </p>
+</div>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bugs</title>
+
+    <!-- Bootstrap -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script>
+
+        var bugs;
+        var numtopics = 5;
+        var model = 'titled_100_symmetric_None';
+        var bug = 'faecalibacterium prausnitzii';
+        var result;
+        var data;
+
+
+        function populateWords(words, topicn, rank) {
+            var wordlist = $("#wordlist_" + rank);
+            var words_sorted = Object.keys(words).sort();
+            for (var i = 0; i < words_sorted.length; i++) {
+                var word = words_sorted[i];
+                if (word != 'topdocs') {
+
+
+                    var entry = $("<li></li>");
+                    entry.attr("class", "list-group-item");
+                    entry.css("cursor", "pointer");
+                    entry.html(word);
+                    entry.click(function (j) {
+                        var param1 = words[word];
+                        var param2 = rank;
+                        var word_copy = word;
+                        var topicn_copy = topicn;
+                        return function () {
+                            $("#docpaneltitle_" + rank).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn_copy + ' and term ' + word_copy);
+                            populateDocs(param1, param2);
+                        }
+                    }(i));
+                    wordlist.append(wordlist, entry);
+                }
+            }
+        }
+        function populateDocs(documents, rank) {
+            var doclist = $("#doclist_" + rank);
+            doclist.empty();
+            for (doc in documents) {
+                doclist.append(doclist, '<li class="list-group-item">' +
+                        '<a href="http://www.ncbi.nlm.nih.gov/pubmed/' + documents[doc][0] + '" target="_blank">' + documents[doc][1] + '</a></li>')
+            }
+        }
+        function populateTopic(topicn, words, rank) {
+            var topics = $("#topics");
+            topics.append(topics, '<div class="row"> <div class="col-md-10"> <figure class="figure"> <h2 id="topictitle_' + rank + '">Topic</h2> <img id="image_' + rank + '" src="" class="figure-img img-fluid img-rounded"style="max-width:100%; max-height:100%;"> <figcaption class="figure-caption"> <h3 id="docpaneltitle_' + rank + '">Top Documents for Topic </h3> <ul class="list-group" id="doclist_' + rank + '"> </ul> </figcaption></figure> </div> <div class="col-md-2"> <ul class="list-group" id="wordlist_' + rank + '"> <!--<li class="list-group-item">word 1</li>--> </ul> </div> </div>');
+            $("#topictitle_" + rank).html("Topic " + topicn);
+            $("#docpaneltitle_" + rank).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn);
+            $("#image_" + rank).attr("src", "clouds/" + model + "/" + topicn + ".png");
+            $("#image_" + rank).click(function(t){ return function(){
+                var rank_copy = rank;
+                var topicn_copy = topicn;
+                var words_copy = words['topdocs'];
+                $("#docpaneltitle_" + rank_copy).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn_copy);
+                populateDocs(words_copy, rank_copy);
+            }}(topicn));
+
+            populateDocs(words['topdocs'], rank);
+            populateWords(words, topicn, rank);
+        }
+        //http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
+        String.prototype.capitalizeFirstLetter = function () {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        }
+        function displayData(json) {
+            data = $.map(json, function (x) {
+                return x
+            });
+            $("#topics").empty();
+            for (var i = 0; i < numtopics * 2; i += 2) {
+                populateTopic(data[i], data[i + 1], i);
+            }
+
+
+        }
+
+        function loadBugs_h(json) {
+            bugs = $.map(json, function (x) {
+                return x
+            });
+            bugs.sort();
+            populateBugs();
+        }
+        function loadBugs() {
+            $.getJSON("json/bugs.json", loadBugs_h);
+        }
+        function loadBug(model, b) {
+            console.log('loading bug ' + b);
+            bug = b;
+            $.getJSON("json/" + b + "_" + model + ".json", displayData);
+
+        }
+        function populateBugs() {
+            var bugselect = $("#bugselect");
+            bugselect.change(
+                    function () {
+                        loadBug(model, $(this).val());
+                    }
+            );
+            for (var i = 0; i < bugs.length; i++) {
+                var bug = bugs[i];
+                var entry = $("<option></option>");
+                entry.html(bug.capitalizeFirstLetter());
+                bugselect.append(bugselect, entry);
+            }
+
+        }
+        loadBugs();
+    </script>
+
+</head>
+<body>
+<!-- Static navbar -->
+<nav class="navbar navbar-default navbar-static-top" style="height:50px">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="about.html">Bug Browser</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="about.html">About</a></li>
+                <li><a href="topics.html">Topic</a></li>
+                <li class="active"><a href="bugs.html">Bugs</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://www.knightslab.org/">Knights Lab</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="modelselect">Model:</label>
+                <select class="form-control" id="modelselect" style="max-height: 500px">
+
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="bugselect">Bug:</label>
+                <select class="form-control" id="bugselect" style="max-height: 500px">
+
+                </select>
+            </div>
+        </div>
+
+    </div>
+    <h1 id="currentBug"></h1>
+</div>
+<div class="container" id="topics">
+
+</div>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+</body>
+</html>
