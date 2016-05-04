@@ -1,8 +1,6 @@
-import sys
+import os, logging, json
 import numpy as np
 from sklearn.preprocessing import normalize
-import logging
-import json
 from gensim.corpora import mmcorpus
 from gensim.matutils import corpus2csc
 from gensim.models.ldamodel import LdaModel
@@ -15,11 +13,10 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 # topicn = int(sys.argv[4])  # 10
 # wordn = int(sys.argv[5])  # 20
 # docn = int(sys.argv[6])  # 5
-def processmodel(model_name, corpus_name, wordn, topicn, docn):
-    model_location = '../doc/' + model_name
-    outfname = '../browser/json/'+model_name+'/'
-    replacementsf = '../doc/models/' + model_name + '/replacements.json'
-    docsXtopicsf = '../doc/models/' + model_name + '/docsXtopics.corpus'
+def processmodel(model_name, model_location, replacementsf, docsXtopicsf, docsf, bugsf, corpus_name, wordn, topicn, docn):
+    output_dir = '../browser/json/'+model_name+'/'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     model = LdaModel.load(model_location)
     bug_to_id = json.loads(open(replacementsf).read())
     # invert to get id<->bug map
@@ -29,17 +26,20 @@ def processmodel(model_name, corpus_name, wordn, topicn, docn):
     corpus_sparse = corpus2csc(corpus, num_terms=len(model.id2word.token2id)).T
     docsXtopics = mmcorpus.MmCorpus(docsXtopicsf)
     docsXtopics_sparse = corpus2csc(docsXtopics).T
-    doc_ids = np.loadtxt('../doc/abstracts_with_titles.txt', dtype=np.int64, delimiter='\t', usecols=(0,))
-    titles = np.loadtxt('../doc/abstracts_with_titles.txt', dtype=str, delimiter='\t', usecols=(1,))
+    doc_ids = np.loadtxt(docsf, dtype=np.int64, delimiter='\t', usecols=(0,))
+    titles = np.loadtxt(docsf, dtype=str, delimiter='\t', usecols=(1,))
     bugs = []
-    for bug in open('../doc/bug_list.txt'):
+    for bug in open(bugsf):
         bug = bug.strip()
+        print bug
         if not "." in bug and " " in bug and bug in bug_to_id:
+            print 'made it'
             # bug is genus and species and has assigned id
             bug_id = bug_to_id[bug]
             if bug_id in model.id2word.token2id:
                 model_id = model.id2word.token2id[bug_id]
                 bugs.append((bug, model_id))
+    print bugs
     bugExpELogBeta = (model.expElogbeta)[:, zip(*bugs)[1]]
     expElogbeta_row = normalize(bugExpELogBeta, axis=0)
     expElogbeta_col = normalize(bugExpELogBeta, axis=1)
@@ -65,7 +65,8 @@ def processmodel(model_name, corpus_name, wordn, topicn, docn):
             top_titles = titles[doc_indices]
             top_titles = top_titles[:min(docn, len(top_titles))]
             topic_dict['topdocs'] = zip(top_docs_for_topic, top_titles)
-            topic_words = list(zip(*model.show_topic(t, wordn))[0])
+            topic_words = list(zip(*model.show_topic(t, wordn))[1])
+            print topic_words
             topic_word_ids = np.array([model.id2word.token2id[word] for word in topic_words])
             for i, word in enumerate(topic_words):
                 if word in id_to_bug:
@@ -87,10 +88,10 @@ def processmodel(model_name, corpus_name, wordn, topicn, docn):
                     topic_dict[topic_words[i]] = zip(comp_top_docs_for_topic, comp_titles)
             topics_dict.append((t, topic_dict))
         bug_dict[bug] = topics_dict
-        with open(bug + "_" + outfname, 'w') as outf:
+        with open(output_dir+bug+'.json', 'w') as outf:
             outf.write(json.dumps(bug_dict[bug], indent=4, separators=(',', ': ')))
-    with open(outfname, 'w') as outf:
-        outf.write(json.dumps(bug_dict, indent=4, separators=(',', ': ')))
-    with open('bugs.json', 'w+') as outf:
-        outf.write(json.dumps(zip(*bugs)[0], indent=4, separators=(',', ': ')))
+    # with open(outfname, 'w') as outf:
+    #     outf.write(json.dumps(bug_dict, indent=4, separators=(',', ': ')))
+    # with open('bugs.json', 'w') as outf:
+    #     outf.write(json.dumps(zip(*bugs)[0], indent=4, separators=(',', ': ')))
 
