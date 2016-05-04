@@ -130,7 +130,7 @@ def getArgs():
     parser.add_argument('-t', '--topics', help='number of topics')
     parser.add_argument('-a', '--alpha', default='symmetric', help='value of alpha hyperparameter')
     parser.add_argument('-e', '--eta', default='None', help='value of eta hyperparameter')
-    parser.add_argument('-b', '--bugs', help='file containing list of bugs')
+    parser.add_argument('-b', '--bugs', default='bug_list.txt', help='file containing list of bugs')
     parser.add_argument('-wc', '--word count', default='30', help='number of words in word cloud')
     parser.add_argument('-dc', '--doc count', default='5', help='number of related documents per term to store')
     parser.add_argument('-tc', '--topic count', default='5', help='number of topics per bug to store')
