@@ -5,7 +5,7 @@ from wordcloud import WordCloud
 from sklearn.preprocessing import normalize
 
 
-def makeclouds(modelf, base_model_name, replacementsf, n_words):
+def make_clouds(modelf, base_model_name, replacementsf, n_words):
     # set locations
     output_d = '../browser/clouds/' + base_model_name + '/'
     if not os.path.exists(output_d):

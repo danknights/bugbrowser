@@ -6,27 +6,39 @@ from gensim.corpora import dictionary, mmcorpus
 from nltk.corpus import stopwords
 from argparse import ArgumentParser
 import logging, json, os
-from make_clouds import makeclouds
-from process_model import processmodel
+from make_clouds import make_clouds
+from process_model import create_json
 
 
 def main():
+    # configure logging for gensim
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # parse command line parameters
     args = getArgs()
+
     # extract file paths and parameters from command line arguments
     corpusf, dictf, docsf, replacementf, model_dir, bugf, modelf, docsXtopicsf, base_model_name = getFilePaths(args)
-    docn, eta, alpha, num_topics, topicn, wordn = getParameters(args)
-    # set up corpus and dictionary, create if necessary
-    corpus, word_dict = getCorpusAndDict(bugf, corpusf, dictf, docsf, replacementf, args['update'])
-    model = models.LdaMulticore(corpus, id2word=word_dict, num_topics=num_topics, alpha=alpha, eta=eta,
-                               passes=1, workers=3)
-    model.save(modelf)
+    docn, eta, alpha, num_topics, topicn, wordn = get_parameters(args)
 
+    # set up corpus and dictionary, create if necessary
+    corpus, word_dict = get_corpus_and_dict(bugf, corpusf, dictf, docsf, replacementf, args['update'])
+
+    # run LDA on the corpus, save model
+    run_lda(alpha, corpus, docsXtopicsf, eta, modelf, num_topics, word_dict)
+
+    # create word cloud for each topic
+    make_clouds(modelf, base_model_name, replacementf, wordn)
+
+    # create json files for each bug for use in browser
+    create_json(base_model_name, modelf, replacementf, docsXtopicsf, docsf, bugf, corpusf, wordn, topicn, docn)
+
+
+def run_lda(alpha, corpus, docsXtopicsf, eta, modelf, num_topics, word_dict):
+    model = models.LdaMulticore(corpus, id2word=word_dict, num_topics=num_topics, alpha=alpha, eta=eta,
+                                passes=4, workers=7)
+    model.save(modelf)
+    # save the documents X topics matrix of the model
     mmcorpus.MmCorpus.serialize(docsXtopicsf, model[corpus])
-    print replacementf
-    makeclouds(modelf, base_model_name, replacementf, wordn)
-    processmodel(base_model_name, modelf, replacementf, docsXtopicsf, docsf, bugf, corpusf, wordn, topicn, docn)
 
 
 # python run_lda.py -u -b ../doc/bug_list.txt -f ../doc/abstracts/faecalibacterium\ prausnitzii.pmed -d practice.dict -c practice.corpus -m practice -t 10 -r ../doc/replacements.json
@@ -46,7 +58,7 @@ def get_words(id_abstract, replacements, tokenizer, lemmatizer, stemmer, stop):
             word.lower() not in stop]
 
 
-def generateReplacements(bugf_name):
+def get_replacements(bugf_name):
     label = 'bug'
     bug_id = 1
     replacements = {}
@@ -62,7 +74,7 @@ def generateReplacements(bugf_name):
     return replacements
 
 
-def getParameters(args):
+def get_parameters(args):
     num_topics = int(args['topics'])
     topicn = int(args['topic count'])
     wordn = int(args['word count'])
@@ -74,11 +86,11 @@ def getParameters(args):
     return docn, eta, alpha, num_topics, topicn, wordn
 
 
-def getCorpusAndDict(bugf, corpusf, dictf, docsf, replacementf, update):
+def get_corpus_and_dict(bugf, corpusf, dictf, docsf, replacementf, update):
     if update:
         stemmer, tokenizer, lemmatizer, stop = PorterStemmer(), RegexpTokenizer(r'[a-zA-Z0-9]{3,}'), \
                                                WordNetLemmatizer(), set(stopwords.words('english'))
-        replacements = generateReplacements(bugf)
+        replacements = get_replacements(bugf)
         with open(replacementf, 'w') as outf:
             json.dump(replacements, outf)
         with open(docsf) as documents:
@@ -95,7 +107,8 @@ def getCorpusAndDict(bugf, corpusf, dictf, docsf, replacementf, update):
 
 
 def getFilePaths(args):
-    model_dir = '../doc/models/' + args['model'] + '/'
+    base_model_name = '_'.join((args['topics'], args['alpha'], args['eta']))
+    model_dir = '../doc/models/' + base_model_name + '/'
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     doc_dir = '../doc/'
@@ -105,8 +118,7 @@ def getFilePaths(args):
     corpusf = doc_dir + base_docsf + '.corpus'
     replacementf = model_dir + 'replacements.json'
     bugf = doc_dir+args['bugs']
-    modelf = model_dir+ args['model']
-    base_model_name = args['model']
+    modelf = model_dir+base_model_name
     docsXtopicsf = model_dir+'docsXtopics.corpus'
     return corpusf, dictf, docsf, replacementf, model_dir, bugf, modelf, docsXtopicsf, base_model_name
 
@@ -114,15 +126,14 @@ def getFilePaths(args):
 def getArgs():
     parser = ArgumentParser(description='Interface to run LDA on abstracts')
     parser.add_argument('-u', '--update', action='store_true', help='perform update with supplied filenames')
-    parser.add_argument('-f', '--file', help='name of file containing abstracts.')
-    parser.add_argument('-m', '--model', help='name of file containing model')
+    parser.add_argument('-f', '--file', default='abstracts_with_titles.txt', help='name of file containing abstracts.')
     parser.add_argument('-t', '--topics', help='number of topics')
-    parser.add_argument('-a', '--alpha', help='value of alpha hyperparameter')
-    parser.add_argument('-e', '--eta', help='value of eta hyperparameter')
+    parser.add_argument('-a', '--alpha', default='symmetric', help='value of alpha hyperparameter')
+    parser.add_argument('-e', '--eta', default='None', help='value of eta hyperparameter')
     parser.add_argument('-b', '--bugs', help='file containing list of bugs')
-    parser.add_argument('-wc', '--word count', help='number of words in word cloud')
-    parser.add_argument('-dc', '--doc count', help='number of related documents per term to store')
-    parser.add_argument('-tc', '--topic count', help='number of topics per bug to store')
+    parser.add_argument('-wc', '--word count', default='30', help='number of words in word cloud')
+    parser.add_argument('-dc', '--doc count', default='5', help='number of related documents per term to store')
+    parser.add_argument('-tc', '--topic count', default='5', help='number of topics per bug to store')
     args = parser.parse_args()
     args = vars(args)
     return args

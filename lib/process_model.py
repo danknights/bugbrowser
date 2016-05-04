@@ -13,7 +13,7 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 # topicn = int(sys.argv[4])  # 10
 # wordn = int(sys.argv[5])  # 20
 # docn = int(sys.argv[6])  # 5
-def processmodel(model_name, model_location, replacementsf, docsXtopicsf, docsf, bugsf, corpus_name, wordn, topicn, docn):
+def create_json(model_name, model_location, replacementsf, docsXtopicsf, docsf, bugsf, corpus_name, wordn, topicn, docn):
     output_dir = '../browser/json/'+model_name+'/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
