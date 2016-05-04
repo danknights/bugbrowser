@@ -3,7 +3,6 @@ import numpy as np
 from gensim.models.ldamodel import LdaModel
 from wordcloud import WordCloud
 from sklearn.preprocessing import normalize
-from tqdm import tqdm
 
 
 def makeclouds(modelf, base_model_name, replacementsf, n_words):
@@ -26,7 +25,7 @@ def makeclouds(modelf, base_model_name, replacementsf, n_words):
     bug_to_id = json.loads(open(replacementsf).read())
     id_to_bug = {v: k for k, v in bug_to_id.items() if "." not in k}
 
-    for i in tqdm(range(len(beta))):
+    for i in range(len(beta)):
         # compute RAR
         t_rar = np.sqrt(pTW[i] * pWT[i])
         top_word_ids = t_rar.argsort()[:-1 - n_words:-1]
