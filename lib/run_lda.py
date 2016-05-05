@@ -15,20 +15,15 @@ def main():
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     # parse command line parameters
     args = getArgs()
-
     # extract file paths and parameters from command line arguments
     corpusf, dictf, docsf, replacementf, model_dir, bugf, modelf, docsXtopicsf, base_model_name = getFilePaths(args)
     docn, eta, alpha, num_topics, topicn, wordn = get_parameters(args)
-
     # set up corpus and dictionary, create if necessary
     corpus, word_dict = get_corpus_and_dict(bugf, corpusf, dictf, docsf, replacementf, args['update'])
-
     # run LDA on the corpus, save model
-    run_lda(alpha, corpus, docsXtopicsf, eta, modelf, num_topics, word_dict)
-
+    # run_lda(alpha, corpus, docsXtopicsf, eta, modelf, num_topics, word_dict)
     # create word cloud for each topic
     make_clouds(modelf, base_model_name, replacementf, wordn)
-
     # create json files for each bug for use in browser
     create_json(base_model_name, modelf, replacementf, docsXtopicsf, docsf, bugf, corpusf, wordn, topicn, docn)
 
