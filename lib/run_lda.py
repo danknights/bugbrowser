@@ -111,7 +111,7 @@ def getFilePaths(args):
     base_docsf = args['file'].split('.')[0]
     dictf = doc_dir + base_docsf + '.dict'
     corpusf = doc_dir + base_docsf + '.corpus'
-    replacementf = model_dir + 'replacements.json'
+    replacementf = doc_dir + 'replacements.json'
     bugf = doc_dir+args['bugs']
     modelf = model_dir+base_model_name
     docsXtopicsf = model_dir+'docsXtopics.corpus'
