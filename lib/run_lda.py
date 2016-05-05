@@ -21,7 +21,7 @@ def main():
     # set up corpus and dictionary, create if necessary
     corpus, word_dict = get_corpus_and_dict(bugf, corpusf, dictf, docsf, replacementf, args['update'])
     # run LDA on the corpus, save model
-    # run_lda(alpha, corpus, docsXtopicsf, eta, modelf, num_topics, word_dict)
+    run_lda(alpha, corpus, docsXtopicsf, eta, modelf, num_topics, word_dict)
     # create word cloud for each topic
     make_clouds(modelf, base_model_name, replacementf, wordn)
     # create json files for each bug for use in browser
@@ -29,8 +29,8 @@ def main():
 
 
 def run_lda(alpha, corpus, docsXtopicsf, eta, modelf, num_topics, word_dict):
-    model = models.LdaMulticore(corpus, id2word=word_dict, num_topics=num_topics, alpha=alpha, eta=eta,
-                                passes=4, workers=7)
+    model = models.LdaModel(corpus, id2word=word_dict, num_topics=num_topics, alpha=alpha, eta=eta,
+                                passes=2)
     model.save(modelf)
     # save the documents X topics matrix of the model
     mmcorpus.MmCorpus.serialize(docsXtopicsf, model[corpus])

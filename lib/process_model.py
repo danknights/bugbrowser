@@ -66,7 +66,6 @@ def create_json(model_name, model_location, replacementsf, docsXtopicsf, docsf, 
             top_titles = top_titles[:min(docn, len(top_titles))]
             topic_dict['topdocs'] = zip(top_docs_for_topic, top_titles)
             topic_words = list(zip(*model.show_topic(t, wordn))[0])
-            print topic_words
             topic_word_ids = np.array([model.id2word.token2id[word] for word in topic_words])
             for i, word in enumerate(topic_words):
                 if word in id_to_bug:
