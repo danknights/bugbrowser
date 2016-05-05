@@ -1,4 +1,4 @@
-import os, logging, json
+import os, logging, json, glob
 import numpy as np
 from sklearn.preprocessing import normalize
 from gensim.corpora import mmcorpus
@@ -7,12 +7,6 @@ from gensim.models.ldamodel import LdaModel
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-# model_name = sys.argv[1]  # ie 'doc/lda_model_200'
-# replacementsf = sys.argv[2]
-# outfname = sys.argv[3]  # ie 'model_name_output.json'
-# topicn = int(sys.argv[4])  # 10
-# wordn = int(sys.argv[5])  # 20
-# docn = int(sys.argv[6])  # 5
 def create_json(model_name, model_location, replacementsf, docsXtopicsf, docsf, bugsf, corpus_name, wordn, topicn, docn):
     output_dir = '../browser/json/'+model_name+'/'
     if not os.path.exists(output_dir):
@@ -89,8 +83,7 @@ def create_json(model_name, model_location, replacementsf, docsXtopicsf, docsf, 
         bug_dict[bug] = topics_dict
         with open(output_dir+bug+'.json', 'w') as outf:
             outf.write(json.dumps(bug_dict[bug], indent=4, separators=(',', ': ')))
-    # with open(outfname, 'w') as outf:
-    #     outf.write(json.dumps(bug_dict, indent=4, separators=(',', ': ')))
-    # with open('bugs.json', 'w') as outf:
-    #     outf.write(json.dumps(zip(*bugs)[0], indent=4, separators=(',', ': ')))
+    b = [bug.split(".")[0] for bug in glob.glob("*.json")]
+    with open('bugs.json', 'w') as outf:
+        outf.write(json.dumps(b))
 

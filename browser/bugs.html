@@ -13,7 +13,7 @@
 
         var bugs;
         var numtopics = 5;
-        var model = 'titled_100_symmetric_None';
+        var model = '50_symmetric_None';
         var bug = 'faecalibacterium prausnitzii';
         var result;
         var data;
@@ -55,17 +55,19 @@
         }
         function populateTopic(topicn, words, rank) {
             var topics = $("#topics");
-            topics.append(topics, '<div class="row"> <div class="col-md-10"> <figure class="figure"> <h2 id="topictitle_' + rank + '">Topic</h2> <img id="image_' + rank + '" src="" class="figure-img img-fluid img-rounded"style="max-width:100%; max-height:100%;"> <figcaption class="figure-caption"> <h3 id="docpaneltitle_' + rank + '">Top Documents for Topic </h3> <ul class="list-group" id="doclist_' + rank + '"> </ul> </figcaption></figure> </div> <div class="col-md-2"> <ul class="list-group" id="wordlist_' + rank + '"> <!--<li class="list-group-item">word 1</li>--> </ul> </div> </div>');
+            topics.append(topics, '<div class="row"> <div class="col-md-9"> <figure class="figure"> <h2 id="topictitle_' + rank + '">Topic</h2> <img id="image_' + rank + '" src="" class="figure-img img-fluid img-rounded"style="max-width:100%; max-height:100%;"> <figcaption class="figure-caption"> <h3 id="docpaneltitle_' + rank + '">Top Documents for Topic </h3> <ul class="list-group" id="doclist_' + rank + '"> </ul> </figcaption></figure> </div> <div class="col-md-3"> <ul class="list-group" id="wordlist_' + rank + '"> <!--<li class="list-group-item">word 1</li>--> </ul> </div> </div>');
             $("#topictitle_" + rank).html("Topic " + topicn);
             $("#docpaneltitle_" + rank).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn);
             $("#image_" + rank).attr("src", "clouds/" + model + "/" + topicn + ".png");
-            $("#image_" + rank).click(function(t){ return function(){
-                var rank_copy = rank;
-                var topicn_copy = topicn;
-                var words_copy = words['topdocs'];
-                $("#docpaneltitle_" + rank_copy).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn_copy);
-                populateDocs(words_copy, rank_copy);
-            }}(topicn));
+            $("#image_" + rank).click(function (t) {
+                return function () {
+                    var rank_copy = rank;
+                    var topicn_copy = topicn;
+                    var words_copy = words['topdocs'];
+                    $("#docpaneltitle_" + rank_copy).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn_copy);
+                    populateDocs(words_copy, rank_copy);
+                }
+            }(topicn));
 
             populateDocs(words['topdocs'], rank);
             populateWords(words, topicn, rank);
@@ -94,12 +96,12 @@
             populateBugs();
         }
         function loadBugs() {
-            $.getJSON("json/bugs.json", loadBugs_h);
+            $.getJSON("json/" + model + "/" + "bugs.json", loadBugs_h);
         }
         function loadBug(model, b) {
             console.log('loading bug ' + b);
             bug = b;
-            $.getJSON("json/" + b + "_" + model + ".json", displayData);
+            $.getJSON("json/" + model + "/" + b + ".json", displayData);
 
         }
         function populateBugs() {
