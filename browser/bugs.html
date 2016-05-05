@@ -13,6 +13,10 @@
 
         var bugs;
         var numtopics = 5;
+        var alpha;
+        var beta;
+        var topics;
+        var models;
         var model = '50_symmetric_None';
         var bug = 'faecalibacterium prausnitzii';
         var result;
@@ -90,13 +94,56 @@
 
         function loadBugs_h(json) {
             bugs = $.map(json, function (x) {
-                return x
+                return x;
             });
             bugs.sort();
             populateBugs();
         }
         function loadBugs() {
             $.getJSON("json/" + model + "/" + "bugs.json", loadBugs_h);
+        }
+        function loadModels_h(json) {
+            var topicnselect = $("#topicnselect");
+            for(var i=0; i<json['topics'].length; i++)
+            {
+                var entry = $("<option></option>");
+                entry.html(json['topics'][i]);
+                topicnselect.append(topicnselect, entry);
+            }
+            topicnselect.change(
+                function() {
+                    model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                    loadBug(model, $("#bugselect").val());
+            });
+            var alphaselect = $("#alphaselect");
+            for(var i=0; i<json['alphas'].length; i++)
+            {
+                var entry = $("<option></option>");
+                entry.html(json['alphas'][i]);
+                alphaselect.append(alphaselect, entry);
+            }
+            alphaselect.change(
+                    function() {
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        loadBug(model, $("#bugselect").val());
+                    });
+            var betaselect  = $("#betaselect");
+            for(var i=0; i<json['betas'].length; i++)
+            {
+                var entry = $("<option></option>");
+                entry.html(json['betas'][i]);
+                betaselect.append(betaselect, entry);
+            }
+            betaselect.change(
+                    function() {
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        loadBug(model, $("#bugselect").val());
+                    });
+            model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+            loadBug(model, $("#bugselect").val());
+        }
+        function loadModels() {
+            $.getJSON("json/model_info.json", loadModels_h);
         }
         function loadBug(model, b) {
             console.log('loading bug ' + b);
@@ -120,6 +167,8 @@
 
         }
         loadBugs();
+        loadModels();
+
     </script>
 
 </head>
@@ -153,10 +202,26 @@
 </nav>
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-2" id="parameters">
             <div class="form-group">
-                <label for="modelselect">Model:</label>
-                <select class="form-control" id="modelselect" style="max-height: 500px">
+                <label for="topicnselect">Topics:</label>
+                <select class="form-control" id="topicnselect" style="max-height: 500px">
+
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="alphaselect">Alpha:</label>
+                <select class="form-control" id="alphaselect" style="max-height: 500px">
+
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="betaselect">Beta:</label>
+                <select class="form-control" id="betaselect" style="max-height: 500px">
 
                 </select>
             </div>

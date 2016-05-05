@@ -22,17 +22,7 @@ def create_json(model_name, model_location, replacementsf, docsXtopicsf, docsf, 
     docsXtopics_sparse = corpus2csc(docsXtopics).T
     doc_ids = np.loadtxt(docsf, dtype=np.int64, delimiter='\t', usecols=(0,))
     titles = np.loadtxt(docsf, dtype=str, delimiter='\t', usecols=(1,))
-    bugs = []
-    for bug in open(bugsf):
-        bug = bug.strip()
-        print bug
-        if not "." in bug and " " in bug and bug in bug_to_id:
-            print 'made it'
-            # bug is genus and species and has assigned id
-            bug_id = bug_to_id[bug]
-            if bug_id in model.id2word.token2id:
-                model_id = model.id2word.token2id[bug_id]
-                bugs.append((bug, model_id))
+    bugs = get_model_bugs(bug_to_id, bugsf, model)
     print bugs
     bugExpELogBeta = (model.expElogbeta)[:, zip(*bugs)[1]]
     expElogbeta_row = normalize(bugExpELogBeta, axis=0)
@@ -86,4 +76,19 @@ def create_json(model_name, model_location, replacementsf, docsXtopicsf, docsf, 
     b = [bug.split(".")[0] for bug in glob.glob("*.json")]
     with open('bugs.json', 'w') as outf:
         outf.write(json.dumps(b))
+
+
+def get_model_bugs(bug_to_id, bugsf, model):
+    bugs = []
+    for bug in open(bugsf):
+        bug = bug.strip()
+        print bug
+        if not "." in bug and " " in bug and bug in bug_to_id:
+            print 'made it'
+            # bug is genus and species and has assigned id
+            bug_id = bug_to_id[bug]
+            if bug_id in model.id2word.token2id:
+                model_id = model.id2word.token2id[bug_id]
+                bugs.append((bug, model_id))
+    return bugs
 
