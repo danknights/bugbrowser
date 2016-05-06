@@ -107,10 +107,15 @@
         }
         function loadModels_h(json) {
             var topicnselect = $("#topicnselect");
-            for(var i=0; i<json['topics'].length; i++)
+            var topics = json['topics'].sort(function(a, b) {
+                var left = parseInt(a);
+                var right = parseInt(b);
+                return left - right;
+            });
+            for(var i=0; i<topics.length; i++)
             {
                 var entry = $("<option></option>");
-                entry.html(json['topics'][i]);
+                entry.html(topics[i]);
                 topicnselect.append(topicnselect, entry);
             }
             topicnselect.change(
@@ -119,10 +124,11 @@
                     loadBug(model, $("#bugselect").val());
             });
             var alphaselect = $("#alphaselect");
-            for(var i=0; i<json['alphas'].length; i++)
+            var alphas = json['alphas'].sort();
+            for(var i=0; i<alphas.length; i++)
             {
                 var entry = $("<option></option>");
-                entry.html(json['alphas'][i]);
+                entry.html(alphas[i]);
                 alphaselect.append(alphaselect, entry);
             }
             alphaselect.change(
@@ -131,18 +137,33 @@
                         loadBug(model, $("#bugselect").val());
                     });
             var betaselect  = $("#betaselect");
-            for(var i=0; i<json['betas'].length; i++)
-            {
+            var betas = json['betas'].sort();
+            for(var i=0; i<betas.length; i++) {
                 var entry = $("<option></option>");
-                entry.html(json['betas'][i]);
+                if (betas[i] != "None"){
+                entry.html(betas[i]);
+            }
+                else {
+                    entry.html('symmetric')
+                }
                 betaselect.append(betaselect, entry);
             }
             betaselect.change(
                     function() {
-                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        var beta = betaselect.val();
+                        if (beta == 'symmetric')
+                        {
+                            beta = 'None'
+                        }
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+beta;
                         loadBug(model, $("#bugselect").val());
                     });
-            model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+            var beta = betaselect.val();
+            if (beta == 'symmetric')
+            {
+                beta = 'None'
+            }
+            model = topicnselect.val()+"_"+alphaselect.val()+"_"+beta;
             loadBug(model, $("#bugselect").val());
         }
         function loadModels() {
@@ -151,7 +172,7 @@
         function loadBug(model, b) {
             console.log('loading bug ' + b);
             bug = b;
-            $.getJSON("json/" + model + "/" + b + ".json", displayData);
+            $.getJSON(encodeURI("json/" + model + "/" + b + ".json"), displayData);
 
         }
         function populateBugs() {

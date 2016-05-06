@@ -66,10 +66,20 @@
             }
             betaselect.change(
                     function() {
-                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        var beta = betaselect.val();
+                        if (beta == 'symmetric')
+                        {
+                            beta = 'None'
+                        }
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+beta;
                         refreshTopics();
                     });
-            model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+            var beta = betaselect.val();
+            if (beta == 'symmetric')
+            {
+                beta = 'None'
+            }
+            model = topicnselect.val()+"_"+alphaselect.val()+"_"+beta;
             refreshTopics();
         }
         function loadModels() {
