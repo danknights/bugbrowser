@@ -24,28 +24,31 @@
 
 
         function populateWords(words, topicn, rank) {
-            var wordlist = $("#wordlist_" + rank);
+            var wordselect = $("#wordselect_" + rank);
+            wordselect.change(function(r)
+            {
+                var words_copy = words;
+                var rank_copy = rank;
+                return function() {
+                    var word = $(this).val();
+                    if (word != '---none---') {
+                        populateDocs(words_copy[word], rank_copy);
+                    }
+                    else {
+                        populateDocs(words_copy['topdocs'], rank_copy);
+                    }
+                }
+            }(rank));
             var words_sorted = Object.keys(words).sort();
+            var topentry = $("<option></option>");
+            topentry.html('---none---');
+            wordselect.append(wordselect, topentry);
             for (var i = 0; i < words_sorted.length; i++) {
                 var word = words_sorted[i];
-                if (word != 'topdocs') {
-
-
-                    var entry = $("<li></li>");
-                    entry.attr("class", "list-group-item");
-                    entry.css("cursor", "pointer");
+                if(word != 'topdocs') {
+                    var entry = $("<option></option>");
                     entry.html(word);
-                    entry.click(function (j) {
-                        var param1 = words[word];
-                        var param2 = rank;
-                        var word_copy = word;
-                        var topicn_copy = topicn;
-                        return function () {
-                            $("#docpaneltitle_" + rank).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn_copy + ' and term ' + word_copy);
-                            populateDocs(param1, param2);
-                        }
-                    }(i));
-                    wordlist.append(wordlist, entry);
+                    wordselect.append(wordselect, entry);
                 }
             }
         }
@@ -59,7 +62,7 @@
         }
         function populateTopic(topicn, words, rank) {
             var topics = $("#topics");
-            topics.append(topics, '<div class="row"> <div class="col-md-9"> <figure class="figure"> <h2 id="topictitle_' + rank + '">Topic</h2> <img id="image_' + rank + '" src="" class="figure-img img-fluid img-rounded"style="max-width:100%; max-height:100%;"> <figcaption class="figure-caption"> <h3 id="docpaneltitle_' + rank + '">Top Documents for Topic </h3> <ul class="list-group" id="doclist_' + rank + '"> </ul> </figcaption></figure> </div> <div class="col-md-3"> <ul class="list-group" id="wordlist_' + rank + '"> <!--<li class="list-group-item">word 1</li>--> </ul> </div> </div>');
+            topics.append(topics, '<div class="row"> <figure class="figure"> <h2 id="topictitle_' + rank + '">Topic</h2> <img id="image_' + rank + '" src="" class="figure-img img-fluid img-rounded center-block"style="max-width:85%; max-height:85%;"> <figcaption class="figure-caption"> <div class="row"><div class="col-md-7"><h3 id="docpaneltitle_' + rank + '">Top Documents for Topic </h3> </div> <div class="col-md-5"><label for="wordselect_'+rank+'" >Filter By Term:</label> <select class="form-control" id="wordselect_'+rank+'" style="max-height: 500px"></select></div> </div> <ul class="list-group" id="doclist_' + rank + '"> </ul> </div>');
             $("#topictitle_" + rank).html("Topic " + topicn);
             $("#docpaneltitle_" + rank).html("Top " + bug.capitalizeFirstLetter() + " Documents for Topic " + topicn);
             $("#image_" + rank).attr("src", "clouds/" + model + "/" + topicn + ".png");
@@ -79,7 +82,7 @@
         //http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
         String.prototype.capitalizeFirstLetter = function () {
             return this.charAt(0).toUpperCase() + this.slice(1);
-        }
+        };
         function displayData(json) {
             data = $.map(json, function (x) {
                 return x

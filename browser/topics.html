@@ -13,15 +13,16 @@
 
         var bugs;
         var numtopics = 5;
-        var model = 'titled_100_symmetric_None';
+        var model = '100_symmetric_None';
         var bug = 'faecalibacterium prausnitzii';
         var result;
         var data;
 
-        function loadBugs() {
-           var image_count = parseInt(model.split("_")[1]);
+        function refreshTopics() {
+           var image_count = parseInt($("#topicnselect").val());
             console.log(image_count);
             var topics = $("#topics");
+            topics.empty();
             for(var i = 0; i<image_count; i++)
             {
                 topics.append(topics, '<div class="row"> ' +
@@ -31,10 +32,54 @@
                         '</figure> </div>  </div>');
             }
         }
+        function loadModels_h(json) {
+            var topicnselect = $("#topicnselect");
+            for(var i=0; i<json['topics'].length; i++)
+            {
+                var entry = $("<option></option>");
+                entry.html(json['topics'][i]);
+                topicnselect.append(topicnselect, entry);
+            }
+            topicnselect.change(
+                    function() {
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        refreshTopics();
+                    });
+            var alphaselect = $("#alphaselect");
+            for(var i=0; i<json['alphas'].length; i++)
+            {
+                var entry = $("<option></option>");
+                entry.html(json['alphas'][i]);
+                alphaselect.append(alphaselect, entry);
+            }
+            alphaselect.change(
+                    function() {
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        refreshTopics();
+                    });
+            var betaselect  = $("#betaselect");
+            for(var i=0; i<json['betas'].length; i++)
+            {
+                var entry = $("<option></option>");
+                entry.html(json['betas'][i]);
+                betaselect.append(betaselect, entry);
+            }
+            betaselect.change(
+                    function() {
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        refreshTopics();
+                    });
+            model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+            refreshTopics();
+        }
+        function loadModels() {
+            $.getJSON("json/model_info.json", loadModels_h);
+
+        }
     </script>
 
 </head>
-<body onload="loadBugs()">
+<body onload="loadModels()">
 <!-- Static navbar -->
 <nav class="navbar navbar-default navbar-static-top" style="height:50px">
     <div class="container">
@@ -64,16 +109,31 @@
 </nav>
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-2" id="parameters">
             <div class="form-group">
-                <label for="modelselect">Model:</label>
-                <select class="form-control" id="modelselect" style="max-height: 500px">
+                <label for="topicnselect">Topics:</label>
+                <select class="form-control" id="topicnselect" style="max-height: 500px">
 
                 </select>
             </div>
         </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="alphaselect">Alpha:</label>
+                <select class="form-control" id="alphaselect" style="max-height: 500px">
 
-    </div>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="betaselect">Beta:</label>
+                <select class="form-control" id="betaselect" style="max-height: 500px">
+
+                </select>
+            </div>
+        </div>
+        </div>
     <h1 id="currentBug"></h1>
 </div>
 <div class="container" id="topics">
