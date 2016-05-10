@@ -120,7 +120,12 @@
             }
             topicnselect.change(
                 function() {
-                    model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                    var beta = betaselect.val();
+                    if (beta == 'symmetric')
+                    {
+                        beta = 'None'
+                    }
+                    model = topicnselect.val()+"_"+alphaselect.val()+"_"+beta;
                     loadBug(model, $("#bugselect").val());
             });
             var alphaselect = $("#alphaselect");
@@ -133,7 +138,12 @@
             }
             alphaselect.change(
                     function() {
-                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+betaselect.val();
+                        var beta = betaselect.val();
+                        if (beta == 'symmetric')
+                        {
+                            beta = 'None'
+                        }
+                        model = topicnselect.val()+"_"+alphaselect.val()+"_"+beta;
                         loadBug(model, $("#bugselect").val());
                     });
             var betaselect  = $("#betaselect");
@@ -172,7 +182,7 @@
         function loadBug(model, b) {
             console.log('loading bug ' + b);
             bug = b;
-            $.getJSON(encodeURI("json/" + model + "/" + b + ".json"), displayData);
+            $.getJSON("json/" + model + "/" + b.toLowerCase().replace(" ", "_") + ".json", displayData);
 
         }
         function populateBugs() {
@@ -198,7 +208,7 @@
 </head>
 <body>
 <!-- Static navbar -->
-<nav class="navbar navbar-default navbar-static-top" style="height:50px">
+<nav class="navbar navbar-default navbar-static-top" style="min-height:50px">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
