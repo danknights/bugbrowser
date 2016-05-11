@@ -7,13 +7,13 @@
 \begin{document}
 \firstpage{1}
 
-\subtitle{Subject Section}
+\subtitle{Data and text mining}
 
-\title[short Title]{This is a title}
-\author[Sample \textit{et~al}.]{Corresponding Author\,$^{\text{\sfb 1,}*}$, Co-Author\,$^{\text{\sfb 2}}$ and Co-Author\,$^{\text{\sfb 2,}*}$}
-\address{$^{\text{\sf 1}}$Department, Institution, City, Post Code, Country and \\
-$^{\text{\sf 2}}$Department, Institution, City, Post Code,
-Country.}
+\title[short Title]{Bug Browser: a topic browser for the gut microbiome }
+\author[Sample \textit{et~al}.]{Dan Knights\,$^{\text{\sfb 1,}*}$, Jeremy Meulemans\,$^{\text{\sfb 2}}$}
+\address{$^{\text{\sf 1}}$Department of Computer Science, University of Minnesota, Minneapolis, 55455, United States and \\
+$^{\text{\sf 2}}$Department of Computer Science, University of Minnesota, Minneapolis, 55455,
+United States.}
 
 \corresp{$^\ast$To whom correspondence should be addressed.}
 
@@ -21,27 +21,29 @@ Country.}
 
 \editor{Associate Editor: XXXXXXX}
 
-\abstract{\textbf{Motivation:} Text Text Text Text Text Text Text Text Text Text Text Text Text
-Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text
-Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text Text
-Text Text Text Text Text Text
-Text Text Text Text Text.\\
-\textbf{Results:} Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text
-Text Text Text Text Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text\\
-\textbf{Availability:} Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text
-Text Text Text Text Text Text Text Text Text Text Text Text Text Text  Text\\
-\textbf{Contact:} \href{name@bio.com}{name@bio.com}\\
+\abstract{\textbf{Motivation:} Analysis of the gut microbiome requires familiarity with an ever-increasing number of bacteria. Some bacteria such as E. coli are very well studied, making the characterization of these bacteria relatively simple. Others such as Faecalibacterium prausnitzii are much more uncommon, with far fewer mentions in the scientific literature, and are correspondingly difficult to gain insights on. For both common and uncommon bacteria, abstracts on Pubmed present a rich source of documents mentioning gut bacteria, and of key findings related to these bacteria. Bug Browser represents an attempt to automate the extraction of relevant topics from this corpus of abstracts through unsupervised topic modeling techniques for the purpose of characterizing known and unknown bacteria of the human gut. \\
+\textbf{Results:} For the corpus of abstracts referencing human gut bacteria, Bug Browser allows for exploration of the topics of this corpus as a whole, and the exploration of the topics and documents most related to a bacterium of interest. This enables a topical view of the body of work related to the human gut microbiome, and insights for the purposes of characterizing bacteria in terms of this topical view. \\
+\textbf{Availability:} Bug Browser is available at http://metagenome.cs.umn.edu/bugbrowser/about.html, source code is available at https://github.com/knights-lab/bugbrowser \\
+\textbf{Contact:} dknights@umn.edu, meule012@umn.edu\\
 \textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics}
 online.}
 
 \maketitle
 
 \section{Introduction}
+When an unfamiliar bacterium is encountered in the process of researching the human gut, a common first step is to simply perform a literature search regarding the bacterium. Many of the hits returned from such a search are references to the Pubmed database, which contains a wealth of abstracts and titles of documents that make reference to these unknown bacteria. In fact, of the 26 million citations available on Pubmed, approximately 600,000 contain citations with titles or abstracts referencing the explicit genus and species of one or more bacteria associated with the human gut(drawn from ). For this search process then, the Pubmed citations for a bacterium of interest, and the topics with which these documents are concerned, present an important source of information concerning the characterization of these bacteria. On an intuitive level, if a bacterium is frequently occurring in documents concerned largely with disease or dysbiosis, a picture begins to form of the current topical associations for the bacterium. As more documents are viewed, this picture may be refined, for instance if the documents often contain explicit references to Crohn's disease or IBS, this disease and dysbiosis view can be made more specific. However, in terms of Pubmed citations, it is often the case that the number of abstracts and titles that explicitly mention a bacterium can be in the hundreds, and occasionally reaching into the hundreds of thousands. For such bacteria, this process of searching, determining associations for a particular document, and then moving to the next document becomes impractical. A more sophisticated approach is needed to automate this process of finding the topical associations of a bacterium of interest. For the corpus of abstracts and titles mentioning bacteria of the human gut on Pubmed, the machine learning field of topic modeling presents a natural approach to automate this manual search process for the purposes of characterizing bacteria. \\ 
+\section{Approach}
+\indent The topic model chosen for analysis of the Pubmed titles and abstracts mentioning human gut bacteria is latent Dirichlet allocation (LDA), a prototypical topic modeling algorithm that attempts to fit a probabilistic model to the underlying semantic structure of a corpus of documents. The assumption made by LDA is that a corpus has a hidden latent structure (topics) that gives rise to the observed structure (words in documents). With this view of a corpus, a topic is then a distribution over the vocabulary of the documents, and a document is viewed as having arisen from a mixture of these word distributions. For a set of documents to which LDA applied, the input is a vector over words for each document of interest, and the output is the documents vectors of proportions over topics, as well as the topics themselves as distributions over words.\\
+\indent To make specific the approach enabled by fitting LDA to the corpus, for a bacterium of interest, the topics that have the highest probability of being associated with that bacterium can be found as an output of the model, from the topic-word distributions. This effectively completes the process of determining the most pertinent topics related to the bacterium across every document, as for each of these most likely topics, the model can be probed for the most prevalent words in that topic. This set of words is human interpretable in the usual understanding of a topic. In contrast to a manual search approach, in which often only a subset of documents mentioning a bacterium can be considered for extracting topical themes, this allows for a much more thorough analysis, because all documents occurring in Pubmed can be simultaneously accounted for when determining the most relevant topics to a bacterium of interest.  
+\\\indent The model produced by LDA then enables a finer degree of granularity with exploration. For a particular bacterium and topic of interest, the model can be used to determine the specific documents mentioning that bacterium that exhibit that topic to the highest degree. In terms of the documents as mixture of topics, this is the act of extracting the document with the highest proportion of the target topic. For a researcher, this means that not only has every document in Pubmed that mentions a bacterium been accounted for in determining what the bacterium is associated with topically, but that  specific documents can be determined that best support the association of the bacterium with this topical assignment. Filtering can also be applied to this set of documents. For instance if the word toxin has a high weight within a topic, then the set of documents mentioning a bacterium that have the highest proportion of a given topic can be subsetted to only documents that mention that bacterium and that term of interest, maintaining that these documents exhibit the highest possible amount of the topic of interest. 
+\\\indent As a last note, the set of topics themselves present a holistic view of the literature surrounding human gut microbiome research, in so far as the topics are programmatically drawn from the abstracts and titles of this body of documents. This provides an overarching view of human gut microbiome research, and what is topically of interest within this research. 
+%\citep{Bag01} wants to know about
+%
+%
+%, Due to the size of the corpus from which the model is created, the model actually enables a deeper exploration of the documents that mention a bacterium, in comparison to manual analysis of the literature. F
+% In terms of abstracts and titles from Pubmed, the mixture of topics giving rise to a title and abstract is precisely the generalization a researcher is looking for. If the documents mentioning a particular bacterium are determined by the topic model to be composed largely of topics regarding disease, and specifically topics that deal with Crohn's disease and IBS, these topics then can be viewed as general associations of a bacterium for further inquiry. \\
+\section{Bug Browser}
 
-Text Text Text Text Text Text  Text Text Text Text Text Text Text
-Text Text  Text Text Text Text Text Text. Figure~\ref{fig:01}
-shows that the above method  Text Text Text Text  Text Text Text
-Text Text Text  Text Text.  \citep{Bag01} wants to know about
 {\ldots}{\ldots} text follows.
 \begin{equation}
 \sum \text{\it x}+ \text{\it y} =\text{\it Z}\label{eq:01}\vspace*{-10pt}
