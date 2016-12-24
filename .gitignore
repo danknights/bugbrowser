@@ -3,3 +3,4 @@
 *.synctex.gz
 doc/
 doc/*
+*.json
