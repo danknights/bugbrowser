@@ -13,11 +13,11 @@ def make_clouds(modelf, base_model_name, replacementsf, n_words):
     # create wordcloud generator
     wc = WordCloud(width=1000, height=500, background_color='white')
 
-    print 'Loading model'
+    print('Loading model')
     model = LdaModel.load(modelf)
     beta = model.expElogbeta
 
-    print 'Normalizing by topics, and by words'
+    print('Normalizing by topics, and by words')
     pTW = normalize(beta, axis=0)
     pWT = normalize(beta, axis=1)
 

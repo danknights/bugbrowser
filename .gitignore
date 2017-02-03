@@ -4,3 +4,8 @@
 doc/
 doc/*
 *.json
+*.xml
+*.iml
+*.pyc
+.vscode/
+.vscode/*
