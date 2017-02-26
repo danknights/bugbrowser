@@ -1,5 +1,6 @@
 *aux
 *.log
+*.png
 *.synctex.gz
 doc/
 doc/*

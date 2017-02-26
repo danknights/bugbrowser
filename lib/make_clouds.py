@@ -5,8 +5,9 @@ from wordcloud import WordCloud
 from sklearn.preprocessing import normalize
 
 
-def make_clouds(modelf, base_model_name, replacementsf, n_words):
+def make_clouds(files, n_words=20):
     # set locations
+    base_model_name = os.path.splitext(os.path.basename(files.model))[0]
     output_d = '../browser/clouds/' + base_model_name + '/'
     if not os.path.exists(output_d):
         os.makedirs(output_d)
@@ -14,7 +15,7 @@ def make_clouds(modelf, base_model_name, replacementsf, n_words):
     wc = WordCloud(width=1000, height=500, background_color='white')
 
     print('Loading model')
-    model = LdaModel.load(modelf)
+    model = LdaModel.load(files.model)
     beta = model.expElogbeta
 
     print('Normalizing by topics, and by words')
@@ -22,7 +23,7 @@ def make_clouds(modelf, base_model_name, replacementsf, n_words):
     pWT = normalize(beta, axis=1)
 
     # load bug<->id map, then invert to id<-> bug
-    bug_to_id = json.loads(open(replacementsf).read())
+    bug_to_id = json.loads(open(files.replacements).read())
     id_to_bug = {v: k for k, v in bug_to_id.items() if "." not in k}
 
     for i in range(len(beta)):

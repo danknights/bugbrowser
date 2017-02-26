@@ -27,13 +27,13 @@ def get_bug_frequency(bug_frequency_json_filename):
         return Counter(loads(f.read()))
 
 
-def bugs_exceeding_count(bug_filename, bug_frequency_filename, min_count):
-    if not os.path.isfile(bug_frequency_filename):
-        freq = create_bug_frequency(bug_filename)
-        with open(bug_frequency_filename, 'w') as f:
+def bugs_exceeding_count(files, min_count):
+    if not os.path.isfile(files.frequency):
+        freq = create_bug_frequency(files.bugs)
+        with open(files.frequency, 'w') as f:
             f.write(dumps(freq))
     else:
-        freq = get_bug_frequency(bug_frequency_filename)
+        freq = get_bug_frequency(files.frequency)
     return [bug for bug in freq if freq[bug] >= min_count]
 
 
