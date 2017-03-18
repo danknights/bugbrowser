@@ -3,7 +3,7 @@
 
 BugBrowser provides insight into the vast amount of literature regarding the human gut microbiome. It is a self-contained tool for scraping PubMed for abstracts, pipelining these abstracts to Gensim [1], performing topic-modeling to extracting per-topic and per-bacterium insight. 
 
-##Overview
+## Overview
 `pubmed_query.py` is responsible for gathering all abstracts for all bacteria of interest via Pubmed’s API. 
 
 `run_lda.py` is responsible for performing the topic-modeling using the open source library Gensim. Several simplifying actions are taken:
