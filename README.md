@@ -1,5 +1,7 @@
-# Bug Browser
-Bug Browser is a tool for automated inference of the human gut microbiome. It is a self-contained library for scraping PubMed for abstracts mentioning a set of bacteria of interest, performing topic-modeling on these abstracts, and extracting per-topic and per-bacterium insight.
+**BugBrowser**
+=================
+
+BugBrowser provides insight into the vast amount of literature regarding the human gut microbiome. It is a self-contained tool for scraping PubMed for abstracts, pipelining these abstracts to Gensim [1], performing topic-modeling to extracting per-topic and per-bacterium insight. 
 
 ##Overview
 `pubmed_query.py` is responsible for gathering all abstracts for all bacteria of interest via Pubmed’s API. 
