@@ -19,6 +19,6 @@ BugBrowser provides insight into the vast amount of literature regarding the hum
 
 `create_json.py` will perform post-processing, taking the documents X words and topics X words matrices and extracting the top topics per bacterium, the top documents mentioning the bacterium by proportion of the topic, and these top documents filtered by each word in each of the top topics. 
 
-##Citations
+#### Citations
 [1] Rehurek,R., Sojka,P. (2010) Software Framework for Topic Modelling with Large Corpora, Proceedings of the LREC 2010 Workshop on New Challenges for NLP Frameworks, 45-50.
 
